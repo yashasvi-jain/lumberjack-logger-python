@@ -1,15 +1,16 @@
 import logging
 import unittest
-from unittest.mock import Mock, patch
+from unittest.mock import patch
 
-from context import Log, Lumberjack, LumberjackFactory
+from LumberjackLogger.lumberjack import Lumberjack
+from LumberjackLogger.models.log import Log
 
 
 class LumberjackTests(unittest.TestCase):
 
     @patch('requests.post')
     def test_emit(self, mock_post):
-        url = 'http://localhost:8080/logs'
+        url = 'http://example.com'
         lumberjack = Lumberjack(url)
         record = logging.LogRecord('test', 1, '', 0, 'message', '', '')
         lumberjack.emit(record)

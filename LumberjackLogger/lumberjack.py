@@ -20,6 +20,7 @@ class Lumberjack(logging.StreamHandler):
     """
 
     def __init__(self, url: str) -> None:
+        self.__url = url
         super().__init__()
 
     def emit(self, record):
@@ -34,7 +35,7 @@ class Lumberjack(logging.StreamHandler):
 
         log = self.build_log(record)
 
-        requests.post('http://localhost:8080/logs', json=log.dict())
+        requests.post(self.__url, json=log.dict())
 
     @staticmethod
     def build_log(record: logging.LogRecord) -> Log:

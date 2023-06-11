@@ -2,7 +2,8 @@ import logging
 import unittest
 from unittest.mock import Mock
 
-from context import LumberjackFactory, Lumberjack
+from LumberjackLogger.lumberjack import Lumberjack
+from LumberjackLogger.LumberjackFactory import LumberjackFactory
 
 
 class LumberjackFactoryTests(unittest.TestCase):
