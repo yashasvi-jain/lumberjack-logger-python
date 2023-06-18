@@ -102,7 +102,8 @@ class Lumberjack(StreamHandler):
         # Traverse up the directory tree until the root of the project is reached
         while True:
             # Check if a specific file or directory exists in the current directory
-            if 'setup.py' in os.listdir(file_directory) or 'requirements.txt' in os.listdir(file_directory):
+            files = os.listdir(file_directory)
+            if 'setup.py' in files or 'requirements.txt' in files or '.git' in files:
                 # Return the name of the current directory as the project root
                 return os.path.basename(file_directory)
 
