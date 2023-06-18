@@ -1,7 +1,5 @@
-import getpass
 import inspect
 import os
-import socket
 import traceback
 from datetime import datetime
 from logging import LogRecord, StreamHandler
@@ -70,17 +68,15 @@ class Lumberjack(StreamHandler):
 
             # Get the applicaiton name
             calling_module = inspect.stack()[1].filename
-            project_name = os.path.basename(os.path.dirname(os.path.abspath(calling_module)))
+            project_name = Lumberjack.get_project_root(calling_module)
 
             log = Log(
                 logLevel=record.levelno,
-                logLevelName=record.levelno,
+                logLevelName=record.levelname,
                 logMessage=record.getMessage(),
                 loggerName=record.filename,
                 environment=os.environ.get("ENV"),
                 applicationName=project_name,
-                username=getpass.getuser(),
-                machineName=socket.gethostname(),
                 timestamp=datetime.now().isoformat(),
                 stackTrace=stack_trace,
             )
@@ -88,3 +84,34 @@ class Lumberjack(StreamHandler):
             print(f"Failed to build log: {e}")
         else:
             return log
+
+    @staticmethod
+    def get_project_root(file_path):
+        """
+        Get the root name of the project based on the provided file path.
+
+        Args:
+            file_path (str): The path of the file.
+
+        Returns:
+            str: The root name of the project.
+        """
+        # Get the directory containing the file
+        file_directory = os.path.dirname(file_path)
+
+        # Traverse up the directory tree until the root of the project is reached
+        while True:
+            # Check if a specific file or directory exists in the current directory
+            if 'setup.py' in os.listdir(file_directory) or 'requirements.txt' in os.listdir(file_directory):
+                # Return the name of the current directory as the project root
+                return os.path.basename(file_directory)
+
+            # Move up to the parent directory
+            file_directory = os.path.dirname(file_directory)
+
+            # Check if the root of the file system is reached
+            if file_directory == os.path.dirname(file_directory):
+                break
+
+        # Return the name of the current directory as the project root
+        return os.path.basename(file_directory)

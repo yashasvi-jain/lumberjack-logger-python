@@ -1,4 +1,6 @@
+import getpass
 import platform
+import socket
 
 from pydantic import BaseModel, Field
 
@@ -54,8 +56,18 @@ class Log(BaseModel):
     class Config:
         validate_assignment = True
 
-    @classmethod
-    def __init_subclass__(cls, **kwargs):
-        super().__init_subclass__(**kwargs)
-        cls.language = platform.python_implementation()
-        cls.languageVersion = platform.python_version()
+    def __init__(self, **data):
+        super().__init__(**data)
+        self.language = platform.python_implementation()
+        self.languageVersion = platform.python_version()
+        self.username = getpass.getuser()
+        self.machineName = socket.gethostname()
+
+    def __str__(self):
+        """
+        Returns a formatted string representation of the Log object.
+        """
+        log_info = []
+        for key, value in self.__dict__.items():
+            log_info.append(f"{key}: {value}")
+        return "\n".join(log_info)
