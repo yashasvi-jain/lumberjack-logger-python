@@ -1,4 +1,5 @@
 import getpass
+import inspect
 import os
 import socket
 import traceback
@@ -68,8 +69,8 @@ class Lumberjack(StreamHandler):
                 stack_trace = traceback.format_exc()
 
             # Get the applicaiton name
-            root_folder = os.path.dirname(os.path.abspath(__file__))
-            project_name = os.path.basename(root_folder)
+            calling_module = inspect.stack()[1].filename
+            project_name = os.path.basename(os.path.dirname(os.path.abspath(calling_module)))
 
             log = Log(
                 logLevel=record.levelno,
