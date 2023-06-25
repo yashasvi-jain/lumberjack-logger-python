@@ -2,68 +2,119 @@ import getpass
 import platform
 import socket
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, root_validator
 
 
 class Log(BaseModel):
     """
-    A Pydantic model class representing a Lumberjack log.
-
-    Attributes:
-    -----------
-    logLevel : int
-        The log level of the log.
-    logLevelName : str
-        The log level name of the log.
-    logMessage : str
-        The message of the log.
-    loggerName : str
-        The logger name of the log.
-    language : str
-        The name of the language.
-    languageVersion : str
-        The version of the language.
-    applicationName : str, optional
-        The name of the application.
-    applicationSuite : str, optional
-        The name of the application suite.
-    environment : str, optional
-        The name of the environment.
-    username : str
-        The username of the user who emitted the log.
-    machineName : str
-        The machine name where the log was emitted.
-    timestamp : str
-        The timestamp when the log was emitted.
-    stackTrace : str, optional
-        The stack trace of the log.
+    A Lumberjack log.
     """
 
-    logLevel: int = Field(..., description="The log level of the log.")
-    logLevelName: str = Field(..., description="The log level name of the log.")
-    logMessage: str = Field(..., description="The message of the log.")
-    loggerName: str = Field(..., description=" The logger name of the log.")
-    language: str = Field(None, description="The name of the language.")
-    languageVersion: str = Field(None, description="The version of the language.")
-    applicationName: str = Field(None, description="The name of the application.")
-    applicationSuite: str = Field(None, description="The name of the application suite.")
-    environment: str = Field(None, description="The name of the environment.")
-    username: str = Field(None, description="The username of the user who emitted the log.")
-    machineName: str = Field(None, description="The machine name where the log was emitted.")
-    timestamp: str = Field(..., description="The timestamp when the log was emitted.")
-    stackTrace: str = Field(None, description="The stack trace of the log.")
+    logLevel: int = Field(..., description='The numerical representation of the log level.')
+    """
+    The numerical representation of the log level.
+    """
 
-    class Config:
-        validate_assignment = True
+    logLevelName: str = Field(..., description='The name of the log level.')
+    """
+    The name of the log level.
+    """
 
-    def __init__(self, **data):
-        super().__init__(**data)
-        self.language = platform.python_implementation()
-        self.languageVersion = platform.python_version()
-        self.username = getpass.getuser()
-        self.machineName = socket.gethostname()
+    logMessage: str = Field(..., description='The message of the log entry.')
+    """
+    The message of the log entry.
+    """
 
-    def __str__(self):
+    loggerName: str = Field(..., description='The name of the logger.')
+    """
+    The name of the logger.
+    """
+
+    language: str = Field(None, description='The name of the language.')
+    """
+    The name of the language.
+    """
+
+    languageVersion: str = Field(None, description='The version of the language.')
+    """
+    The version of the language.
+    """
+
+    applicationName: str = Field(None, description='The name of the application.')
+    """
+    The name of the application associated with the log entry.
+    """
+
+    applicationId: str = Field(None, description='The ID of the application.')
+    """
+    The ID of the application associated with the log entry.
+    """
+
+    applicationSuite: str = Field(None, description='The name of the application suite.')
+    """
+    The name of the application suite associated with the log entry.
+    """
+
+    applicationSuiteId: str = Field(None, description='The ID of the application suite.')
+    """
+    The ID of the application suite associated with the log entry.
+    """
+
+    environment: str = Field(None, description='The name of the environment.')
+    """
+    The name of the environment in which the log entry was generated.
+    """
+
+    username: str = Field(..., description='The username of the user who emitted the log.')
+    """
+    The username of the user who emitted the log entry.
+    """
+
+    machineName: str = Field(..., description='The machine name where the log was emitted.')
+    """
+    The name of the machine where the log entry was emitted.
+    """
+
+    timestamp: str = Field(..., description='The timestamp when the log was emitted.')
+    """
+    The timestamp when the log entry was emitted.
+    """
+
+    stackTrace: str = Field(None, description='The stack trace of the log.')
+    """
+    The stack trace associated with the log entry, if available.
+    """
+
+    filename: str = Field(None, description='The filename where the logger was invoked.')
+    """
+    The filename where the logger was invoked.
+    """
+
+    pathname: str = Field(None, description='The absolute file path for the file the logger was invoked.')
+    """
+    The absolute file path for the file the logger was invoked.
+    """
+
+
+    @root_validator(pre=True)
+    def set_defaults(cls, values: dict):
+        """
+        Sets default values for certain fields if they are not provided.
+
+        Args:
+            values (dict): The values of the fields.
+
+        Returns:
+            dict: The modified values dictionary with default values set.
+
+        """
+        values.setdefault('language', platform.python_implementation())
+        values.setdefault('languageVersion', platform.python_version())
+        values.setdefault('username', getpass.getuser())
+        values.setdefault('machineName', socket.gethostname())
+        return values
+
+    def __str__(self) -> str:
         """
         Returns a formatted string representation of the Log object.
         """

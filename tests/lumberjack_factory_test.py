@@ -2,8 +2,8 @@ import logging
 import unittest
 from unittest.mock import Mock
 
-from LumberjackLogger.lumberjack import Lumberjack
-from LumberjackLogger.LumberjackFactory import LumberjackFactory
+from LumberjackLogger.lumberjack_factory import LumberjackFactory
+from LumberjackLogger.lumberjack_handler import LumberjackHandler
 
 
 class LumberjackFactoryTests(unittest.TestCase):
@@ -15,7 +15,7 @@ class LumberjackFactoryTests(unittest.TestCase):
         expected_log_level = logging.DEBUG
 
         # Create a mock Lumberjack handler instance
-        lumberjack_mock = Mock(spec=Lumberjack)
+        lumberjack_mock = Mock(spec=LumberjackHandler)
 
         # Create a mock logger
         logger_mock = Mock(spec=logging.Logger)

@@ -5,13 +5,14 @@ import socket
 import traceback
 import unittest
 from logging import CRITICAL, LogRecord
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 
-from LumberjackLogger.lumberjack import Lumberjack
+from LumberjackLogger import LumberjackHandler
 from LumberjackLogger.models.log import Log
 
 
-class LumberjackTests(unittest.TestCase):
+class LumberjackHandlerTests(unittest.TestCase):
+
     URL = 'http://example.com'
     APP_NAME = "lumberjack-logger-python"
     TEST_ENV = "test_env"
@@ -26,10 +27,16 @@ class LumberjackTests(unittest.TestCase):
         func=None,
     )
 
+    def setUp(self) -> None:
+        self.mock_log = MagicMock(spec=Log)
+        self.mock_log.dict.return_value = MagicMock()
+
     @patch('requests.post')
     def test_emit(self, mock_post):
-        lumberjack = Lumberjack(self.URL)
-        lumberjack.emit(self.RECORD)
+
+        with patch('LumberjackLogger.models.log.Log', self.mock_log):
+            lumberjack = LumberjackHandler(self.URL)
+            lumberjack.emit(self.RECORD)
 
         mock_post.assert_called_once()
 
@@ -42,7 +49,7 @@ class LumberjackTests(unittest.TestCase):
 
     def test_build_log(self):
         os.environ["ENV"] = self.TEST_ENV
-        log = Lumberjack.build_log(self.RECORD)
+        log = LumberjackHandler.build_log(self.RECORD)
 
         self.assertIsInstance(log, Log,
                               "Expected an instance of 'Log'.")
@@ -58,7 +65,7 @@ class LumberjackTests(unittest.TestCase):
                          "The expected Language is not equal to the actual Language.")
         self.assertEqual(log.languageVersion, platform.python_version(),
                          "The expected LanguageVersion is not equal to the actual LanguageVersion.")
-        self.assertEqual(log.applicationName, self.APP_NAME,
+        self.assertEqual(log.applicationName, None,
                          "The expected ApplicationName is not equal to the actual ApplicationName.")
         self.assertEqual(log.applicationSuite, None,
                          "The expected ApplicationSuite is not equal to the actual ApplicationSuite.")
