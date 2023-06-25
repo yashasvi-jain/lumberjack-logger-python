@@ -1,15 +1,13 @@
-from setuptools import setup
+from setuptools import find_packages, setup
 
-__version__ = '1.1.0'
+__version__ = '1.1.1'
 
 setup(
     name='LumberjackLogger',
     version=__version__,
     description='The Lumberjack python logger.',
     keywords=['lumberjack', 'logger', 'package'],
-    packages=[
-        'LumberjackLogger',
-    ],
+    packages=find_packages(),
     install_requires=[
         'pydantic',
         'Requests'
