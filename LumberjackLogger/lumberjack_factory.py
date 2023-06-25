@@ -1,7 +1,7 @@
 import logging
 import os
 
-from .lumberjack_handler import LumberjackHandler
+from LumberjackLogger.lumberjack_handler import LumberjackHandler
 
 
 class LumberjackFactory:
@@ -10,13 +10,15 @@ class LumberjackFactory:
     """
 
     @staticmethod
-    def CreateInstance(logger_name: str, url: str, application_name: str = None) -> logging.Logger:
+    def CreateInstance(logger_name: str, log_level: str | int = logging.DEBUG, url: str = None, application_name: str = None) -> logging.Logger:
         """
         Creates a new logger with the specified name and returns it.
 
         Args:
             logger_name (str): The name of the logger being returned.
+            log_level (str | int): The log level of the logger. It can be specified using either a string name or an integer value.
             url (str): The URL to be used by the Lumberjack handler.
+            application_name (str, optional): The name of the application. Defaults to None.
 
         Returns:
             logging.Logger: The logger with the Lumberjack handler.
@@ -25,7 +27,7 @@ class LumberjackFactory:
 
         # Logger
         logger = logging.getLogger(logger_name)
-        logger.setLevel(logging.DEBUG)
+        logger.setLevel(log_level)
 
         # Handler
         handler = LumberjackHandler(url, application_name)

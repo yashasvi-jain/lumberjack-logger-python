@@ -12,7 +12,7 @@ class LumberjackFactoryTests(unittest.TestCase):
         # Arrange
         logger_name = 'test_logger'
         url = 'http://example.com'
-        expected_log_level = logging.DEBUG
+        expected_log_level = logging.INFO
 
         # Create a mock Lumberjack handler instance
         lumberjack_mock = Mock(spec=LumberjackHandler)
@@ -28,7 +28,12 @@ class LumberjackFactoryTests(unittest.TestCase):
         logging_mock.getLogger.return_value = logger_mock
 
         # Create an instance of the LumberjackFactory
-        logger = LumberjackFactory.CreateInstance(logger_name, url)
+        logger = LumberjackFactory.CreateInstance(
+            logger_name=logger_name,
+            url=url,
+            log_level=logging.INFO,
+            application_name='test app'
+        )
 
         # Assert
         self.assertEqual(logger.name, logger_name)

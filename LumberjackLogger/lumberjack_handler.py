@@ -6,7 +6,7 @@ from logging import LogRecord, StreamHandler
 import requests
 from requests import HTTPError
 
-from .models.log import Log
+from LumberjackLogger.models.log import Log
 
 
 class LumberjackHandler(StreamHandler):
