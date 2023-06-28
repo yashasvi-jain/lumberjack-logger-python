@@ -28,10 +28,9 @@ class LumberjackHandler(StreamHandler):
             application_name (str, optional): The name of the application. Defaults to None.
 
         """
-
+        super().__init__()
         self.__url: str = url
         LumberjackHandler.application_name: str = application_name
-        super().__init__()
 
     def emit(self, record: LogRecord):
         """
@@ -40,6 +39,9 @@ class LumberjackHandler(StreamHandler):
         Args:
             record (LogRecord): The log record to be emitted.
         """
+
+        # Emit the record to console or wherever StreamHandler is set to output
+        super().emit(record)
 
         log: Log = self.build_log(record)
 
