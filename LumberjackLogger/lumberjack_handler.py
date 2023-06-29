@@ -1,10 +1,12 @@
+import json
 import os
 import traceback
 from datetime import datetime
 from logging import LogRecord, StreamHandler
+from typing import Optional
 
 import requests
-from requests import HTTPError
+from requests import HTTPError, Response
 
 from LumberjackLogger.models.log import Log
 
@@ -45,11 +47,14 @@ class LumberjackHandler(StreamHandler):
 
         log: Log = self.build_log(record)
 
+        payload = json.loads(log.json())
+
         try:
-            request = requests.post(self.__url, json=log.dict())
+            headers: dict = {'Content-Type': 'application/json'}
+            request: Response = requests.post(self.__url, json=payload, headers=headers)
             request.raise_for_status()
         except HTTPError as e:
-            print(f"HTTP error occured: {e}")
+            print(e)
 
     @staticmethod
     def build_log(record: LogRecord) -> Log:
@@ -64,7 +69,7 @@ class LumberjackHandler(StreamHandler):
 
         """
 
-        stack_trace = None
+        stack_trace: Optional[str] = None
 
         try:
             if record.exc_info is not None:
@@ -77,7 +82,7 @@ class LumberjackHandler(StreamHandler):
                 loggerName=record.filename,
                 environment=os.environ.get("ENV"),
                 applicationName=LumberjackHandler.application_name,
-                timestamp=datetime.now().isoformat(),
+                timestamp=datetime.now(),
                 stackTrace=stack_trace,
                 filename=record.filename,
                 pathname=record.pathname
