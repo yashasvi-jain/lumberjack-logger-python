@@ -1,8 +1,7 @@
 import logging
-import os
 from typing import Optional
 
-from LumberjackLogger.lumberjack_handler import LumberjackHandler
+from lumberjack.lumberjack_handler import LumberjackHandler
 
 
 class LumberjackFactory:
@@ -11,7 +10,10 @@ class LumberjackFactory:
     """
 
     @staticmethod
-    def CreateInstance(logger_name: Optional[str], url: Optional[str], application_name: Optional[str], log_level: str | int = logging.DEBUG) -> logging.Logger:
+    def CreateInstance(logger_name: Optional[str] = None,
+                       url: Optional[str] = None,
+                       application_name: Optional[str] = None,
+                       log_level: str | int = logging.DEBUG) -> logging.Logger:
         """
         Creates a new logger with the specified name and returns it.
 
@@ -33,9 +35,6 @@ class LumberjackFactory:
         # Handler
         handler = LumberjackHandler(url, application_name)
 
-        # Add filter to handler to modify pathname
-        handler.addFilter(PathnameFilter())
-
         # Formatting
         formatter = logging.Formatter(
             '%(asctime)s [%(levelname)s] %(filename)s: %(message)s')
@@ -43,13 +42,3 @@ class LumberjackFactory:
 
         logger.addHandler(handler)
         return logger
-
-
-class PathnameFilter(logging.Filter):
-    """
-    This filter will modify the pathname of a record.
-    """
-
-    def filter(self, record):
-        record.pathname = os.path.abspath(record.pathname)
-        return True

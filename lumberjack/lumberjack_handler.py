@@ -8,7 +8,7 @@ from typing import Optional
 import requests
 from requests import HTTPError, Response
 
-from LumberjackLogger.models.log import Log
+from lumberjack.models.log import Log
 
 
 class LumberjackHandler(StreamHandler):
@@ -16,12 +16,12 @@ class LumberjackHandler(StreamHandler):
     A custom log handler class that formats log messages and sends them to a logging endpoint.
     """
 
-    application_name: str = None
+    application_name: Optional[str] = None
     """
     The name of the application.
     """
 
-    def __init__(self, url: str, application_name: str = None) -> None:
+    def __init__(self, url: Optional[str], application_name: Optional[str] = None) -> None:
         """
         Initializes the Lumberjack log handler.
 
@@ -31,10 +31,10 @@ class LumberjackHandler(StreamHandler):
 
         """
         super().__init__()
-        self.__url: str = url
-        LumberjackHandler.application_name: str = application_name
+        self.__url: Optional[str] = url
+        LumberjackHandler.application_name = application_name
 
-    def emit(self, record: LogRecord):
+    def emit(self, record: LogRecord) -> None:
         """
         Emits the log record to the Lumberjack logging endpoint.
 
@@ -45,19 +45,20 @@ class LumberjackHandler(StreamHandler):
         # Emit the record to console or wherever StreamHandler is set to output
         super().emit(record)
 
-        log: Log = self.build_log(record)
+        log = LumberjackHandler.build_log(record)
 
-        payload = json.loads(log.json())
-
-        try:
-            headers: dict = {'Content-Type': 'application/json'}
-            request: Response = requests.post(self.__url, json=payload, headers=headers)
-            request.raise_for_status()
-        except HTTPError as e:
-            print(e)
+        if log and self.__url:
+            payload = json.loads(log.model_dump_json())
+            try:
+                headers: dict = {'Content-Type': 'application/json'}
+                request: Response = requests.post(
+                    self.__url, json=payload, headers=headers)
+                request.raise_for_status()
+            except HTTPError as e:
+                print(e)
 
     @staticmethod
-    def build_log(record: LogRecord) -> Log:
+    def build_log(record: LogRecord) -> Optional[Log]:
         """
         Builds a Log object from a log record.
 
@@ -80,14 +81,37 @@ class LumberjackHandler(StreamHandler):
                 logLevelName=record.levelname,
                 logMessage=record.getMessage(),
                 loggerName=record.filename,
-                environment=os.environ.get("ENV"),
+                environment=os.environ.get('ENV'),
                 applicationName=LumberjackHandler.application_name,
                 timestamp=datetime.now(),
                 stackTrace=stack_trace,
                 filename=record.filename,
-                pathname=record.pathname
+                filepath=record.pathname,
+                lineno=record.lineno,
+                code=LumberjackHandler._get_code(record.pathname)
             )
+            return log
         except Exception as e:
             print(f"Failed to build log: {e}")
-        else:
-            return log
+            return None
+
+    @staticmethod
+    def _get_code(filepath: str) -> Optional[str]:
+        """
+        Reads the code from the provided filepath.
+
+        Args:
+            filepath (str): The path of the file to read.
+
+        Returns:
+            str: The code from the file.
+        """
+        if not filepath:
+            return None
+
+        try:
+            with open(filepath, 'r') as f:
+                code: str = f.read()
+                return code
+        except:
+            return None

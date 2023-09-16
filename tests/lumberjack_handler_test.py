@@ -7,11 +7,14 @@ import unittest
 from logging import CRITICAL, LogRecord
 from unittest.mock import MagicMock, patch
 
-from LumberjackLogger import LumberjackHandler
-from LumberjackLogger.models.log import Log
+from lumberjack import LumberjackHandler
+from lumberjack.models.log import Log
 
 
 class LumberjackHandlerTests(unittest.TestCase):
+    """
+    Test cases for the LumberjackHandler class.
+    """
 
     URL = 'http://example.com'
     APP_NAME = "lumberjack-logger-python"
@@ -19,7 +22,7 @@ class LumberjackHandlerTests(unittest.TestCase):
     RECORD = LogRecord(
         name='test',
         level=CRITICAL,
-        pathname='',
+        pathname=__file__,
         lineno=0,
         msg='message',
         args=(),
@@ -32,9 +35,11 @@ class LumberjackHandlerTests(unittest.TestCase):
         self.mock_log.dict.return_value = MagicMock()
 
     @patch('requests.post')
-    def test_emit(self, mock_post):
-
-        with patch('LumberjackLogger.models.log.Log', self.mock_log):
+    def test_emit(self, mock_post: MagicMock) -> None:
+        """
+        Sets up mock objects used in the tests.
+        """
+        with patch('lumberjack.models.log.Log', self.mock_log):
             lumberjack = LumberjackHandler(self.URL)
             lumberjack.emit(self.RECORD)
 
@@ -47,9 +52,15 @@ class LumberjackHandlerTests(unittest.TestCase):
 
         self.assertIsInstance(log, Log)
 
-    def test_build_log(self):
-        os.environ["ENV"] = self.TEST_ENV
-        log = LumberjackHandler.build_log(self.RECORD)
+    def test_build_log(self) -> None:
+        """
+        Test if the `build_log` method correctly builds a log object from a LogRecord.
+        """
+        os.environ['ENV'] = self.TEST_ENV
+        log: Log = LumberjackHandler.build_log(self.RECORD)
+
+        with open(__file__, 'r') as f:
+            expected_code: str = f.read()
 
         self.assertIsInstance(log, Log,
                               "Expected an instance of 'Log'.")
@@ -77,6 +88,9 @@ class LumberjackHandlerTests(unittest.TestCase):
                          "The expected MachineName is not equal to the actual MachineName.")
         self.assertEqual(log.stackTrace, traceback.format_exc(),
                          "The expected StackTrace is not equal to the actual Stack.")
+        self.assertEqual(log.lineno, self.RECORD.lineno,
+                         "The expected line number is not equal to the actual Stack.")
+        self.assertEqual(log.code, expected_code)
 
 
 if __name__ == '__main__':
