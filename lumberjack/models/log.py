@@ -113,11 +113,15 @@ class Log(BaseModel):
 
     lineno: Optional[int] = Field(
         None, description='The line number in the file where the logger was invoked.')
-    """The line number in the file where the logger was invoked."""
+    """
+    The line number in the file where the logger was invoked.
+    """
 
     code: Optional[str] = Field(
         None, description='The source code where the logger was invoked.')
-    """The source code where the logger was invoked."""
+    """
+    The source code where the logger was invoked.
+    """
 
     @model_validator(mode='before')
     @classmethod
@@ -145,4 +149,4 @@ class Log(BaseModel):
         log_info = []
         for key, value in self.__dict__.items():
             log_info.append(f"{key}: {value}")
-        return "\n".join(log_info)
+        return '\n'.join(log_info)

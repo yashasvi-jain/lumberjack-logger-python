@@ -3,7 +3,7 @@ import os
 import traceback
 from datetime import datetime
 from logging import LogRecord, StreamHandler
-from typing import Optional
+from typing import Dict, Optional
 
 import requests
 from requests import HTTPError, Response
@@ -21,15 +21,15 @@ class LumberjackHandler(StreamHandler):
     The name of the application.
     """
 
-    def __init__(self, url: Optional[str], application_name: Optional[str] = None) -> None:
+    def __init__(self, url: Optional[str] = None, application_name: Optional[str] = None) -> None:
         """
         Initializes the Lumberjack log handler.
 
         Args:
             url (str): The URL of the logging endpoint.
             application_name (str, optional): The name of the application. Defaults to None.
-
         """
+
         super().__init__()
         self.__url: Optional[str] = url
         LumberjackHandler.application_name = application_name
@@ -50,7 +50,7 @@ class LumberjackHandler(StreamHandler):
         if log and self.__url:
             payload = json.loads(log.model_dump_json())
             try:
-                headers: dict = {'Content-Type': 'application/json'}
+                headers: Dict = {'Content-Type': 'application/json'}
                 request: Response = requests.post(
                     self.__url, json=payload, headers=headers)
                 request.raise_for_status()
@@ -67,7 +67,6 @@ class LumberjackHandler(StreamHandler):
 
         Returns:
             Log: The built Log object.
-
         """
 
         stack_trace: Optional[str] = None
@@ -106,6 +105,7 @@ class LumberjackHandler(StreamHandler):
         Returns:
             str: The code from the file.
         """
+
         if not filepath:
             return None
 
