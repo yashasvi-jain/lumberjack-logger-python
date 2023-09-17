@@ -24,6 +24,13 @@ class LumberjackFactoryTests(unittest.TestCase):
         self.mock_getLogger = MagicMock()
         self.mock_logger = MagicMock(spec=logging.Logger)
 
+    def tearDown(self) -> None:
+        """
+        Clean up after tests, setting shared attributes to None.
+        """
+
+        LumberjackHandler.application_name = None
+
     def test_create_instance(self) -> None:
         """
         Test the `CreateInstance` method for creating a logger instance.
@@ -113,7 +120,7 @@ class LumberjackFactoryTests(unittest.TestCase):
 
         self.assertFalse(logger.hasHandlers())
 
-        LumberjackFactory.add_handler(logger, mock_handler)
+        LumberjackFactory._add_handler(logger, mock_handler)
 
         self.assertTrue(logger.hasHandlers())
         self.assertEqual(logger.handlers.pop(), mock_handler)

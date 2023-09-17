@@ -59,7 +59,7 @@ class LumberjackHandlerTests(unittest.TestCase):
         Test if the `build_log` method correctly builds a log object from a LogRecord.
         """
         os.environ['ENV'] = self.TEST_ENV
-        log: Log = LumberjackHandler.build_log(self.RECORD)
+        log: Log = LumberjackHandler._build_log(self.RECORD)
 
         with open(__file__, 'r') as f:
             expected_code: str = f.read()

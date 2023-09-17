@@ -41,7 +41,7 @@ class LumberjackFactory:
 
         # Handler
         if handler:
-            logger = LumberjackFactory.add_handler(
+            logger = LumberjackFactory._add_handler(
                 logger,
                 LumberjackHandler(url, application_name)
             )
@@ -49,7 +49,7 @@ class LumberjackFactory:
         return logger
 
     @staticmethod
-    def add_handler(logger: logging.Logger, handler: logging.Handler) -> logging.Logger:
+    def _add_handler(logger: logging.Logger, handler: logging.Handler) -> logging.Logger:
         """
         Adds a specified handler to a logger instance.
 

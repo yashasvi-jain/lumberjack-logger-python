@@ -45,7 +45,7 @@ class LumberjackHandler(StreamHandler):
         # Emit the record to console or wherever StreamHandler is set to output
         super().emit(record)
 
-        log = LumberjackHandler.build_log(record)
+        log = LumberjackHandler._build_log(record)
 
         if log and self.__url:
             payload = json.loads(log.model_dump_json())
@@ -58,7 +58,7 @@ class LumberjackHandler(StreamHandler):
                 print(e)
 
     @staticmethod
-    def build_log(record: LogRecord) -> Optional[Log]:
+    def _build_log(record: LogRecord) -> Optional[Log]:
         """
         Builds a Log object from a log record.
 
@@ -91,7 +91,7 @@ class LumberjackHandler(StreamHandler):
             )
             return log
         except Exception as e:
-            print(f"Failed to build log: {e}")
+            print(f'Failed to build log: {e}')
             return None
 
     @staticmethod
