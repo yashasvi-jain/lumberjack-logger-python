@@ -34,6 +34,8 @@ class LumberjackHandlerTests(unittest.TestCase):
         self.mock_log = MagicMock(spec=Log)
         self.mock_log.dict.return_value = MagicMock()
 
+        LumberjackHandler.application_name = None
+
     @patch('requests.post')
     def test_emit(self, mock_post: MagicMock) -> None:
         """
