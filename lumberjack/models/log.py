@@ -2,8 +2,9 @@ import getpass
 import platform
 import socket
 from datetime import datetime
+from typing import Dict, Optional
 
-from pydantic import BaseModel, Field, root_validator
+from pydantic import BaseModel, Field, model_validator
 
 
 class Log(BaseModel):
@@ -11,7 +12,8 @@ class Log(BaseModel):
     A Lumberjack log.
     """
 
-    logLevel: int = Field(..., description='The numerical representation of the log level.')
+    logLevel: int = Field(...,
+                          description='The numerical representation of the log level.')
     """
     The numerical representation of the log level.
     """
@@ -31,74 +33,99 @@ class Log(BaseModel):
     The name of the logger.
     """
 
-    language: str = Field(None, description='The name of the language.')
+    language: Optional[str] = Field(
+        None, description='The name of the language.')
     """
     The name of the language.
     """
 
-    languageVersion: str = Field(None, description='The version of the language.')
+    languageVersion: Optional[str] = Field(
+        None, description='The version of the language.')
     """
     The version of the language.
     """
 
-    applicationName: str = Field(None, description='The name of the application.')
+    applicationName: Optional[str] = Field(
+        None, description='The name of the application.')
     """
     The name of the application associated with the log entry.
     """
 
-    applicationId: str = Field(None, description='The ID of the application.')
+    applicationId: Optional[str] = Field(
+        None, description='The ID of the application.')
     """
     The ID of the application associated with the log entry.
     """
 
-    applicationSuite: str = Field(None, description='The name of the application suite.')
+    applicationSuite: Optional[str] = Field(
+        None, description='The name of the application suite.')
     """
     The name of the application suite associated with the log entry.
     """
 
-    applicationSuiteId: str = Field(None, description='The ID of the application suite.')
+    applicationSuiteId: Optional[str] = Field(
+        None, description='The ID of the application suite.')
     """
     The ID of the application suite associated with the log entry.
     """
 
-    environment: str = Field(None, description='The name of the environment.')
+    environment: Optional[str] = Field(
+        None, description='The name of the environment.')
     """
     The name of the environment in which the log entry was generated.
     """
 
-    username: str = Field(..., description='The username of the user who emitted the log.')
+    username: str = Field(...,
+                          description='The username of the user who emitted the log.')
     """
     The username of the user who emitted the log entry.
     """
 
-    machineName: str = Field(..., description='The machine name where the log was emitted.')
+    machineName: str = Field(...,
+                             description='The machine name where the log was emitted.')
     """
     The name of the machine where the log entry was emitted.
     """
 
-    timestamp: datetime = Field(..., description='The timestamp when the log was emitted.')
+    timestamp: datetime = Field(...,
+                                description='The timestamp when the log was emitted.')
     """
     The timestamp when the log entry was emitted.
     """
 
-    stackTrace: str = Field(None, description='The stack trace of the log.')
+    stackTrace: Optional[str] = Field(
+        None, description='The stack trace of the log.')
     """
     The stack trace associated with the log entry, if available.
     """
 
-    filename: str = Field(None, description='The filename where the logger was invoked.')
+    filename: Optional[str] = Field(
+        None, description='The filename where the logger was invoked.')
     """
     The filename where the logger was invoked.
     """
 
-    pathname: str = Field(None, description='The absolute file path for the file the logger was invoked.')
+    filepath: Optional[str] = Field(
+        None, description='The absolute file path for the file the logger was invoked.')
     """
     The absolute file path for the file the logger was invoked.
     """
 
+    lineno: Optional[int] = Field(
+        None, description='The line number in the file where the logger was invoked.')
+    """
+    The line number in the file where the logger was invoked.
+    """
 
-    @root_validator(pre=True)
-    def set_defaults(cls, values: dict):
+    code: Optional[str] = Field(
+        None, description='The source code where the logger was invoked.')
+    """
+    The source code where the logger was invoked.
+    """
+
+    @model_validator(mode='before')
+    @classmethod
+    def set_defaults(cls, values: dict) -> Dict:
         """
         Sets default values for certain fields if they are not provided.
 
@@ -122,4 +149,4 @@ class Log(BaseModel):
         log_info = []
         for key, value in self.__dict__.items():
             log_info.append(f"{key}: {value}")
-        return "\n".join(log_info)
+        return '\n'.join(log_info)
