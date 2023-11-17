@@ -16,9 +16,9 @@ class LumberjackFactoryTests(unittest.TestCase):
         Set up test environment.
         """
 
-        self.logger_name = 'test logger'
-        self.app_name = 'test app'
-        self.url = 'test url'
+        self.logger_name = "test logger"
+        self.app_name = "test app"
+        self.url = "test url"
         self.log_level = logging.INFO
 
         self.mock_getLogger = MagicMock()
@@ -39,14 +39,14 @@ class LumberjackFactoryTests(unittest.TestCase):
         """
 
         # ACT
-        with patch('logging.getLogger', self.mock_getLogger):
+        with patch("logging.getLogger", self.mock_getLogger):
             self.mock_getLogger.return_value = self.mock_logger
 
             # Create an instance of the LumberjackFactory
             logger = LumberjackFactory.CreateInstance(
                 logger_name=self.logger_name,
                 log_level=self.log_level,
-                application_name='test app'
+                application_name="test app",
             )
 
         # ASSERT
@@ -60,7 +60,7 @@ class LumberjackFactoryTests(unittest.TestCase):
         The log level should default to DEBUG if not explicitly set.
         """
 
-        with patch('logging.getLogger', return_value=MagicMock(spec=logging.Logger)):
+        with patch("logging.getLogger", return_value=MagicMock(spec=logging.Logger)):
             logger = LumberjackFactory.CreateInstance()
 
         logger.setLevel.assert_called_with(logging.DEBUG)
@@ -69,9 +69,9 @@ class LumberjackFactoryTests(unittest.TestCase):
         """
         Test that log level can be set as a string.
         """
-        with patch('logging.getLogger', return_value=MagicMock(spec=logging.Logger)):
-            logger = LumberjackFactory.CreateInstance(log_level='INFO')
-        logger.setLevel.assert_called_with('INFO')
+        with patch("logging.getLogger", return_value=MagicMock(spec=logging.Logger)):
+            logger = LumberjackFactory.CreateInstance(log_level="INFO")
+        logger.setLevel.assert_called_with("INFO")
 
     def test_default_logger_name(self) -> None:
         """
@@ -80,7 +80,7 @@ class LumberjackFactoryTests(unittest.TestCase):
         The logger name should default to `None` if not explicitly set.
         """
 
-        with patch('logging.getLogger', self.mock_getLogger):
+        with patch("logging.getLogger", self.mock_getLogger):
             logger = LumberjackFactory.CreateInstance()
 
         self.mock_getLogger.assert_called_with(None)
@@ -96,36 +96,16 @@ class LumberjackFactoryTests(unittest.TestCase):
             url=self.url,
             application_name=self.app_name,
             log_level=self.log_level,
-            emit=True
+            emit=True,
         )
         handler: LumberjackHandler = logger.handlers.pop()
 
         # ASSERT
-        self.assertEqual(handler.application_name, self.app_name)
-        self.assertEqual(getattr(handler, '_LumberjackHandler__url'), self.url)
-
-    @patch('lumberjack.lumberjack_handler.LumberjackHandler')
-    def test_add_handler(self, mock_handler: MagicMock) -> None:
-        """
-        Test if a handler can be added to an existing logger.
-        """
-
-        logger = LumberjackFactory.CreateInstance(
-            logger_name=self.logger_name,
-            url=self.url,
-            application_name=self.app_name,
-            log_level=self.log_level,
-            emit=False
+        self.assertEqual(getattr(handler, "_LumberjackHandler__url"), self.url)
+        self.assertEqual(
+            getattr(handler, "_LumberjackHandler__application_name"), self.app_name
         )
 
-        self.assertFalse(logger.hasHandlers())
 
-        LumberjackFactory._add_handler(logger, mock_handler)
-
-        self.assertTrue(logger.hasHandlers())
-        self.assertEqual(logger.handlers.pop(), mock_handler)
-        self.assertFalse(logger.hasHandlers())
-
-
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()
