@@ -92,12 +92,12 @@ class LumberjackFactoryTests(unittest.TestCase):
 
         # ACT
         logger = LumberjackFactory.CreateInstance(
-                logger_name=self.logger_name,
-                url=self.url,
-                application_name=self.app_name,
-                log_level=self.log_level,
-                handler=True
-            )
+            logger_name=self.logger_name,
+            url=self.url,
+            application_name=self.app_name,
+            log_level=self.log_level,
+            emit=True
+        )
         handler: LumberjackHandler = logger.handlers.pop()
 
         # ASSERT
@@ -111,12 +111,12 @@ class LumberjackFactoryTests(unittest.TestCase):
         """
 
         logger = LumberjackFactory.CreateInstance(
-                logger_name=self.logger_name,
-                url=self.url,
-                application_name=self.app_name,
-                log_level=self.log_level,
-                handler=False
-            )
+            logger_name=self.logger_name,
+            url=self.url,
+            application_name=self.app_name,
+            log_level=self.log_level,
+            emit=False
+        )
 
         self.assertFalse(logger.hasHandlers())
 
@@ -125,6 +125,7 @@ class LumberjackFactoryTests(unittest.TestCase):
         self.assertTrue(logger.hasHandlers())
         self.assertEqual(logger.handlers.pop(), mock_handler)
         self.assertFalse(logger.hasHandlers())
+
 
 if __name__ == '__main__':
     unittest.main()

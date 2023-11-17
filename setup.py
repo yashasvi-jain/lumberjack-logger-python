@@ -1,9 +1,9 @@
 from setuptools import find_packages, setup
 
-__version__ = '0.0.2'
+__version__ = '0.0.3'
 
 setup(
-    name='LumberjackLogger',
+    name='lumberjack',
     version=__version__,
     description='The Lumberjack python logger.',
     keywords=['lumberjack', 'logger', 'package'],
